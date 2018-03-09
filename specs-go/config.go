@@ -58,6 +58,31 @@ type Process struct {
 	SelinuxLabel string `json:"selinuxLabel,omitempty" platform:"linux"`
 }
 
+// HypervisorProcess is like Process, except for launching the hypervisor instead of for launching a container process.
+type Process struct {
+	// User specifies user information for the process.
+	User User `json:"user"`
+	// Args specifies the binary and arguments for the application to execute.
+	Args []string `json:"args"`
+	// Env populates the process environment for the process.
+	Env []string `json:"env,omitempty"`
+	// Cwd is the current working directory for the process and must be
+	// relative to the container's root.
+	Cwd string `json:"cwd"`
+	// Capabilities are Linux capabilities that are kept for the process.
+	Capabilities *LinuxCapabilities `json:"capabilities,omitempty" platform:"linux"`
+	// Rlimits specifies rlimit options to apply to the process.
+	Rlimits []POSIXRlimit `json:"rlimits,omitempty" platform:"linux,solaris"`
+	// NoNewPrivileges controls whether additional privileges could be gained by processes in the container.
+	NoNewPrivileges bool `json:"noNewPrivileges,omitempty" platform:"linux"`
+	// ApparmorProfile specifies the apparmor profile for the container.
+	ApparmorProfile string `json:"apparmorProfile,omitempty" platform:"linux"`
+	// Specify an oom_score_adj for the container.
+	OOMScoreAdj *int `json:"oomScoreAdj,omitempty" platform:"linux"`
+	// SelinuxLabel specifies the selinux context that the container process is run as.
+	SelinuxLabel string `json:"selinuxLabel,omitempty" platform:"linux"`
+}
+
 // LinuxCapabilities specifies the whitelist of capabilities that are kept for a process.
 // http://man7.org/linux/man-pages/man7/capabilities.7.html
 type LinuxCapabilities struct {
@@ -504,19 +529,11 @@ type WindowsHyperV struct {
 // VM contains information for virtual-machine-based containers.
 type VM struct {
 	// Hypervisor specifies hypervisor-related configuration for virtual-machine-based containers.
-	Hypervisor VMHypervisor `json:"hypervisor,omitempty"`
+	Hypervisor *HypervisorProcess `json:"hypervisor,omitempty"`
 	// Kernel specifies kernel-related configuration for virtual-machine-based containers.
 	Kernel VMKernel `json:"kernel"`
 	// Image specifies guest image related configuration for virtual-machine-based containers.
 	Image VMImage `json:"image,omitempty"`
-}
-
-// VMHypervisor contains information about the hypervisor to use for a virtual machine.
-type VMHypervisor struct {
-	// Path is the host path to the hypervisor used to manage the virtual machine.
-	Path string `json:"path"`
-	// Parameters specifies parameters to pass to the hypervisor.
-	Parameters string `json:"parameters,omitempty"`
 }
 
 // VMKernel contains information about the kernel to use for a virtual machine.
